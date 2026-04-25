@@ -1,0 +1,74 @@
+# GitHub Actions CI Workflow
+# Runs automatically on every git push to any branch
+
+# What is CI (Continuous Integration)?
+# Automated checks that run every time you push code.
+# Like having a robot that:
+# 1. Checks your code style (linting)
+# 2. Verifies Docker builds without errors
+# Before anyone reviews your code.
+# If CI fails → red X on GitHub → fix before merging.
+
+name: Clovertex Pipeline CI
+
+# When to run this workflow
+on:
+  push:
+    branches: ["**"]    # Every branch
+  pull_request:
+    branches: ["main"]  # PRs targeting main
+
+jobs:
+  lint:
+    # What machine to run on (GitHub provides this free)
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download our code onto the CI machine
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python 3.11
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Step 3: Install ruff (fast Python linter)
+      - name: Install ruff
+        run: pip install ruff
+
+      # What is ruff?
+      # A Python linter written in Rust.
+      # Checks your code for style issues and bugs.
+      # 10-100x faster than flake8.
+      # Example errors it catches:
+      # - Unused imports
+      # - Undefined variables
+      # - Lines too long (>88 chars)
+
+      # Step 4: Run linting on all Python files
+      - name: Run ruff lint
+        run: ruff check pipeline/
+
+      # Step 5: Check formatting
+      - name: Run ruff format check
+        run: ruff format --check pipeline/
+
+  docker-build:
+    runs-on: ubuntu-latest
+    # Only run docker build after lint passes
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Build the Docker image to verify it works
+      # We don't RUN the pipeline in CI (no data files)
+      # Just verify the image BUILDS successfully
+      - name: Build Docker image
+        run: docker build -t clovertex-pipeline:ci .
+
+      - name: Verify image exists
+        run: docker image inspect clovertex-pipeline:ci

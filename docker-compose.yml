@@ -1,0 +1,39 @@
+# Docker Compose version
+version: "3.9"
+
+# What is docker-compose?
+# A tool to define and run multi-container Docker apps.
+# With one command "docker-compose up" it:
+# 1. Builds the Docker image from our Dockerfile
+# 2. Creates a container
+# 3. Mounts volumes so output persists after container exits
+# 4. Runs the pipeline
+# 5. Exits with code 0 (success) or 1 (failure)
+
+services:
+  pipeline:
+    # Build from our Dockerfile in current directory
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    # Container name for easy identification
+    container_name: clovertex-pipeline
+
+    # Volumes: mount local folders into container
+    # Format: "local_path:container_path"
+    # This means output written to /app/datalake INSIDE container
+    # appears in ./datalake on your Mac OUTSIDE container
+    # So files PERSIST after container exits!
+    volumes:
+      - ./datalake:/app/datalake
+
+    # Environment variables inside container
+    environment:
+      - PYTHONUNBUFFERED=1
+      # PYTHONUNBUFFERED=1 means Python prints logs immediately
+      # Without this, logs appear all at once at the end
+
+      # Exit code from container becomes exit code of compose
+      # Required for CI to detect failures
+    restart: "no"

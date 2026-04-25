@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.git/
+.github/
+datalake/
+*.egg-info/
+.DS_Store
+.env
+README.md

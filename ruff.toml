@@ -1,0 +1,26 @@
+# Ruff linter configuration
+# Tells ruff what rules to apply to our code
+
+line-length = 88
+
+[lint]
+# E = pycodestyle errors
+# F = pyflakes (undefined names, unused imports)
+# W = pycodestyle warnings
+select = ["E", "F", "W"]
+
+# Rules we deliberately ignore:
+ignore = [
+    "E501",  # Line too long (we allow longer lines in comments)
+    "F401",  # Unused imports (some are used dynamically)
+    "E712",  # Comparison to True/False (we use == True intentionally)
+    "W291",  # Trailing whitespace
+    "W293",  # Whitespace before comment
+]
+
+# Folders ruff should NOT check
+exclude = [
+    "venv/",
+    "__pycache__/",
+    ".git/",
+]
