@@ -339,8 +339,8 @@ def plot_high_risk_summary(
         "moderate": COLORS["teal"]
     }
     bar_colors = [
-        level_colors.get(l, COLORS["blue"])
-        for l in level_counts.index
+        level_colors.get(lvl, COLORS["blue"])
+        for lvl in level_counts.index
     ]
     bars = ax1.bar(
         level_counts.index,
